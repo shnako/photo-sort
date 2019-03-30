@@ -1,14 +1,13 @@
 package com.shnako.photosort.sorters;
 
 import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +17,8 @@ import java.util.stream.Collectors;
 import static com.shnako.photosort.Constants.EXT_SEPARATOR;
 import static com.shnako.photosort.Constants.FILE_NAME_FORMAT;
 import static com.shnako.photosort.Constants.SEPARATOR;
-import static com.shnako.photosort.Constants.TAG_EXIF_DATE;
+import static com.shnako.photosort.Constants.TAG_EXIF_SUB_DATETIME;
+import static com.shnako.photosort.Constants.TAG_EXIF_DATETIME;
 
 public class DateTimeSorter implements Sorter {
     /**
@@ -33,17 +33,40 @@ public class DateTimeSorter implements Sorter {
         for (Path path : paths) {
             try {
                 Metadata metadata = ImageMetadataReader.readMetadata(path.toFile());
-                Directory exifDirectory = metadata.getDirectoriesOfType(ExifIFD0Directory.class).iterator().next();
 
-                DateTime dateTime = new DateTime(exifDirectory.getDate(TAG_EXIF_DATE));
-                String newPath = dateTime.toString(FILE_NAME_FORMAT);
-                addPathToMap(path, newPath, fileNames);
-            } catch (ImageProcessingException | IOException e) {
-                e.printStackTrace();
+                DateTime dateTime = getDateTimeFromSubExif(metadata);
+                if (dateTime == null) {
+                    dateTime = getDateTimeFromExif(metadata);
+                }
+
+                if (dateTime != null) {
+                    String newPath = dateTime.toString(FILE_NAME_FORMAT);
+                    addPathToMap(path, newPath, fileNames);
+                }
+            } catch (Exception e) {
+                System.out.println("Could not determine time for " + path + ". This will not be renamed.");
             }
         }
 
         return flipAndAddExtensions(fileNames);
+    }
+
+    private DateTime getDateTimeFromSubExif(Metadata metadata) {
+        try {
+            Directory exifSubDirectory = metadata.getDirectoriesOfType(ExifSubIFDDirectory.class).iterator().next();
+            return new DateTime(exifSubDirectory.getDate(TAG_EXIF_SUB_DATETIME));
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private DateTime getDateTimeFromExif(Metadata metadata) {
+        try {
+            Directory exifDirectory = metadata.getDirectoriesOfType(ExifIFD0Directory.class).iterator().next();
+            return new DateTime(exifDirectory.getDate(TAG_EXIF_DATETIME));
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     private void addPathToMap(Path path, String newPath, Map<String, Path> dateFileNames) {
