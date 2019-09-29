@@ -11,6 +11,13 @@
     <url>http://maven.apache.org</url>
 
     <properties>
+        <commons.io.version>2.5</commons.io.version>
+        <commons.lang.version>3.0</commons.lang.version>
+        <isoparser.version>1.9.27</isoparser.version>
+        <joda.time.version>2.9.9</joda.time.version>
+        <junit.version>4.12</junit.version>
+        <metadata.extractor.version>2.10.1</metadata.extractor.version>
+
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
     </properties>
@@ -19,29 +26,37 @@
         <dependency>
             <groupId>com.drewnoakes</groupId>
             <artifactId>metadata-extractor</artifactId>
-            <version>2.10.1</version>
+            <version>${metadata.extractor.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.mp4parser</groupId>
             <artifactId>isoparser</artifactId>
-            <version>1.9.27</version>
+            <version>${isoparser.version}</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.5</version>
+            <version>${commons.io.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons.lang.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.9</version>
+            <version>${joda.time.version}</version>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
