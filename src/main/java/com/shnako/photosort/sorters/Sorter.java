@@ -5,5 +5,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface Sorter {
-    Map<Path, String> getNewFileNames(List<Path> paths);
+    Map<Path, String> getNewFileNames(List<Path> paths, String prefix);
 }

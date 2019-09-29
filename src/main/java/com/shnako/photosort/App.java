@@ -16,7 +16,7 @@ public class App {
         Sorter sorter = new DateTimeSorter();
         Path folderToScanPath;
 
-        System.out.println("I'll be using the " + sorter.getClass() + ".");
+        System.out.println("I'll be using the " + sorter.getClass().getSimpleName() + ".");
         while(true) {
             System.out.println("Please specify the path to the folder containing the images to sort: ");
             String folderToScan = scanInput.nextLine().trim();
@@ -27,8 +27,11 @@ public class App {
             System.out.println("Invalid path. Please try again.");
         }
 
+        System.out.println("Please specify the prefix to use or press enter to skip:");
+        String namePrefix = scanInput.nextLine().trim();
+
         List<Path> images = FileUtils.getImagesInDirectory(folderToScanPath);
-        Map<Path, String> newImageNames = sorter.getNewFileNames(images);
+        Map<Path, String> newImageNames = sorter.getNewFileNames(images, namePrefix);
         for (Map.Entry<Path, String> newImageName : newImageNames.entrySet()) {
             System.out.println(newImageName.getKey().getFileName().toString() + " -> " + newImageName.getValue());
         }

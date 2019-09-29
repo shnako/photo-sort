@@ -6,6 +6,7 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.nio.file.Path;
@@ -27,7 +28,7 @@ public class DateTimeSorter implements Sorter {
      * @param paths - The Path objects for the files to analyze.
      * @return A map of file path objects to the suggested new names.
      */
-    public Map<Path, String> getNewFileNames(List<Path> paths) {
+    public Map<Path, String> getNewFileNames(List<Path> paths, String prefix) {
         Map<String, Path> fileNames = new HashMap<>(paths.size());
 
         for (Path path : paths) {
@@ -41,6 +42,9 @@ public class DateTimeSorter implements Sorter {
 
                 if (dateTime != null) {
                     String newPath = dateTime.toString(FILE_NAME_FORMAT);
+                    if (StringUtils.isNotBlank(prefix)) {
+                        newPath = prefix + SEPARATOR + newPath;
+                    }
                     addPathToMap(path, newPath, fileNames);
                 }
             } catch (Exception e) {
