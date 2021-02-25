@@ -15,10 +15,14 @@ final class FileUtils {
         }
     }
 
-    static void renameFiles(Map<Path, String> newFileNames) throws IOException {
+    static void renameFiles(Map<Path, String> newFileNames) {
         for (Map.Entry<Path, String> newFileName : newFileNames.entrySet()) {
-            Path targetDirectory = newFileName.getKey().getParent();
-            Files.move(newFileName.getKey(), targetDirectory.resolve(newFileName.getValue()));
+            try {
+                Path targetDirectory = newFileName.getKey().getParent();
+                Files.move(newFileName.getKey(), targetDirectory.resolve(newFileName.getValue()));
+            } catch (Exception ex) {
+                System.out.printf("Could not rename %s to %s: %s%n", newFileName.getKey(), newFileName.getValue(), ex.toString());
+            }
         }
     }
 }
