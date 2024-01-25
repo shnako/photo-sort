@@ -78,8 +78,17 @@ public class DateTimeSorter implements Sorter {
         String fileName = path.getFileName().toString();
         Matcher regexMatcher = datePattern.matcher(fileName);
         if (regexMatcher.find()) {
+            int dateStringStart = regexMatcher.start();
+            if (dateStringStart > 0 && Character.isDigit(fileName.charAt(regexMatcher.start() - 1))) {
+                // It's just part of a longer number.
+                return null;
+            }
+            fileName = fileName.substring(regexMatcher.start());
+            if (Character.isDigit(fileName.charAt(8))) {
+                fileName = fileName.substring(0, 8) + "_" + fileName.substring(8);
+            }
             fileName = FilenameUtils.removeExtension(fileName);
-            return fileName.substring(regexMatcher.start());
+            return fileName;
         }
         return null;
     }
