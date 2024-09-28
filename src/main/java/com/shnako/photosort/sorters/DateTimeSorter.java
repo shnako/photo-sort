@@ -5,14 +5,18 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifIFD0Directory;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.mov.QuickTimeDirectory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,8 +24,9 @@ import java.util.stream.Collectors;
 import static com.shnako.photosort.Constants.EXT_SEPARATOR;
 import static com.shnako.photosort.Constants.FILE_NAME_FORMAT;
 import static com.shnako.photosort.Constants.SEPARATOR;
-import static com.shnako.photosort.Constants.TAG_EXIF_SUB_DATETIME;
+import static com.shnako.photosort.Constants.TAGS_QUICKTIME_DATETIME;
 import static com.shnako.photosort.Constants.TAG_EXIF_DATETIME;
+import static com.shnako.photosort.Constants.TAG_EXIF_SUB_DATETIME;
 
 public class DateTimeSorter implements Sorter {
     private final Pattern datePattern = Pattern.compile("20[0-9]{6}");
@@ -42,6 +47,9 @@ public class DateTimeSorter implements Sorter {
                 DateTime dateTime = getDateTimeFromSubExif(metadata);
                 if (dateTime == null) {
                     dateTime = getDateTimeFromExif(metadata);
+                }
+                if (dateTime == null) {
+                    dateTime = getDateTimeFromQuicktime(metadata);
                 }
 
                 String newPath;
@@ -97,6 +105,31 @@ public class DateTimeSorter implements Sorter {
         try {
             Directory exifDirectory = metadata.getDirectoriesOfType(ExifIFD0Directory.class).iterator().next();
             return new DateTime(exifDirectory.getDate(TAG_EXIF_DATETIME));
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private DateTime getDateTimeFromQuicktime(Metadata metadata) {
+        try {
+            Collection<QuickTimeDirectory> quicktimeTags = metadata.getDirectoriesOfType(QuickTimeDirectory.class);
+
+            if (quicktimeTags.isEmpty()) {
+                return null;
+            }
+
+            for (int tagId : TAGS_QUICKTIME_DATETIME) {
+                Optional<Date> dateTime = quicktimeTags
+                        .stream()
+                        .filter(tag -> tag.containsTag(tagId))
+                        .map(x -> x.getDate(tagId))
+                        .findAny();
+                if (dateTime.isPresent()) {
+                    return new DateTime(dateTime.get());
+                }
+            }
+
+            return null;
         } catch (Exception ex) {
             return null;
         }

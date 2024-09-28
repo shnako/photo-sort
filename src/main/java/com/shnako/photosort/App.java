@@ -17,7 +17,7 @@ public class App {
         Path folderToScanPath;
 
         System.out.println("I'll be using the " + sorter.getClass().getSimpleName() + ".");
-        while(true) {
+        while (true) {
             System.out.println("Please specify the path to the folder containing the images to sort: ");
             String folderToScan = scanInput.nextLine().trim();
             folderToScanPath = Paths.get(folderToScan);
