@@ -9,6 +9,7 @@ import com.drew.metadata.mov.QuickTimeDirectory;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -54,7 +55,7 @@ public class DateTimeSorter implements Sorter {
 
                 String newPath;
                 if (dateTime != null) {
-                    newPath = dateTime.toString(FILE_NAME_FORMAT);
+                    newPath = dateTime.withZone(DateTimeZone.UTC).toString(FILE_NAME_FORMAT);
                 } else {
                     newPath = getNewFileNameFromExistingFileName(path);
                 }
@@ -80,25 +81,6 @@ public class DateTimeSorter implements Sorter {
         } catch (Exception ex) {
             return null;
         }
-    }
-
-    private String getNewFileNameFromExistingFileName(Path path) {
-        String fileName = path.getFileName().toString();
-        Matcher regexMatcher = datePattern.matcher(fileName);
-        if (regexMatcher.find()) {
-            int dateStringStart = regexMatcher.start();
-            if (dateStringStart > 0 && Character.isDigit(fileName.charAt(regexMatcher.start() - 1))) {
-                // It's just part of a longer number.
-                return null;
-            }
-            fileName = fileName.substring(regexMatcher.start());
-            if (Character.isDigit(fileName.charAt(8))) {
-                fileName = fileName.substring(0, 8) + "_" + fileName.substring(8);
-            }
-            fileName = FilenameUtils.removeExtension(fileName);
-            return fileName;
-        }
-        return null;
     }
 
     private DateTime getDateTimeFromExif(Metadata metadata) {
@@ -133,6 +115,25 @@ public class DateTimeSorter implements Sorter {
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    private String getNewFileNameFromExistingFileName(Path path) {
+        String fileName = path.getFileName().toString();
+        Matcher regexMatcher = datePattern.matcher(fileName);
+        if (regexMatcher.find()) {
+            int dateStringStart = regexMatcher.start();
+            if (dateStringStart > 0 && Character.isDigit(fileName.charAt(regexMatcher.start() - 1))) {
+                // It's just part of a longer number.
+                return null;
+            }
+            fileName = fileName.substring(regexMatcher.start());
+            if (Character.isDigit(fileName.charAt(8))) {
+                fileName = fileName.substring(0, 8) + "_" + fileName.substring(8);
+            }
+            fileName = FilenameUtils.removeExtension(fileName);
+            return fileName;
+        }
+        return null;
     }
 
     private void addPathToMap(Path path, String newPath, Map<String, Path> dateFileNames) {
