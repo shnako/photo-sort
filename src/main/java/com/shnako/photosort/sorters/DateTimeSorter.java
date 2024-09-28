@@ -54,7 +54,7 @@ public class DateTimeSorter implements Sorter {
                 }
 
                 String newPath;
-                if (dateTime != null) {
+                if (dateTime != null && dateTime.isBefore(DateTime.now().withTimeAtStartOfDay())) {
                     newPath = dateTime.withZone(DateTimeZone.UTC).toString(FILE_NAME_FORMAT);
                 } else {
                     newPath = getNewFileNameFromExistingFileName(path);
