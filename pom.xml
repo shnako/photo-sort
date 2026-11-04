@@ -12,11 +12,11 @@
 
     <properties>
         <commons.io.version>2.14.0</commons.io.version>
-        <commons.lang.version>3.11</commons.lang.version>
+        <commons.lang.version>3.18.0</commons.lang.version>
         <isoparser.version>1.9.27</isoparser.version>
         <joda.time.version>2.10.10</joda.time.version>
         <junit.version>4.13.2</junit.version>
-        <metadata.extractor.version>2.15.0</metadata.extractor.version>
+        <metadata.extractor.version>2.18.0</metadata.extractor.version>
 
         <maven.compiler.target>13</maven.compiler.target>
         <maven.compiler.source>13</maven.compiler.source>
